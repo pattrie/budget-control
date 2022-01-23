@@ -23,6 +23,8 @@ public class RevenueGatewayImpl implements RevenueGateway {
 
   @Override
   public Optional<Revenue> findByDescriptionAndValue(final Revenue revenue) {
+    log.info("Find revenue by description: {} and value: {}", revenue.getDescription(),
+        revenue.getValue());
     return repository.findByDescriptionAndValue(revenue.getDescription(), revenue.getValue());
   }
 
