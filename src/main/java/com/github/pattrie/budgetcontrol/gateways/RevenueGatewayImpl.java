@@ -30,4 +30,9 @@ public class RevenueGatewayImpl implements RevenueGateway {
   public List<Revenue> findAll() {
     return repository.findAll();
   }
+
+  @Override
+  public Optional<Revenue> findBy(String id) {
+    return repository.findById(id);
+  }
 }

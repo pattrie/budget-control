@@ -49,8 +49,17 @@ public class RevenueService {
     return ResponseEntity.created(URI.create(LOCATION + revenueSaved.getId())).body(revenueSaved);
   }
 
-  public List<RevenueResponseJson> listAll() {
+  public List<RevenueResponseJson> gettAll() {
     return revenueGateway.findAll().stream().map(revenue ->
         mapper.map(revenue, RevenueResponseJson.class)).collect(Collectors.toList());
+  }
+
+  public ResponseEntity<RevenueResponseJson> getBy(final String id) {
+    final Optional<Revenue> revenue = revenueGateway.findBy(id);
+    if (revenue.isPresent()) {
+      final RevenueResponseJson revenueResponseJson = mapper.map(revenue.get(), RevenueResponseJson.class);
+      return ResponseEntity.ok().body(revenueResponseJson);
+    }
+    return ResponseEntity.noContent().build();
   }
 }

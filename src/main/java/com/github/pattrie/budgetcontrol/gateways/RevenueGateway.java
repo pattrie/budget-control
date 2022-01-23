@@ -11,4 +11,6 @@ public interface RevenueGateway {
   Optional<Revenue> findByDescriptionAndValue(final Revenue revenue);
 
   List<Revenue> findAll();
+
+  Optional<Revenue> findBy(final String id);
 }
