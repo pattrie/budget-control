@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,35 +35,33 @@ public class BudgetControlController {
   @PostMapping(consumes = APPLICATION_JSON_VALUE)
   public ResponseEntity<RevenueResponseJson> create(
       @RequestBody @Valid final RevenueRequestJson revenueRequestJson) {
-
-    log.info("Creation of Revenue: {}", revenueRequestJson.getDescription());
-
+    log.info("Creation of Revenue :: {}", revenueRequestJson.getDescription());
     return revenueService.create(converter.convert(revenueRequestJson));
   }
 
   @GetMapping(produces = APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public List<RevenueResponseJson> getAll() {
-
     log.info("List all revenues.");
-
     return revenueService.getAll();
   }
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<RevenueResponseJson> getBy(@PathVariable final String id) {
-
-    log.info("Find revenue with ID: {}", id);
-
+    log.info("Find revenue with ID :: {}", id);
     return revenueService.getBy(id);
   }
 
   @PutMapping(value = "/{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-  public ResponseEntity<RevenueResponseJson> update(@PathVariable final String id,
+  public ResponseEntity<RevenueResponseJson> updateBy(@PathVariable final String id,
       @RequestBody @Valid final RevenueRequestJson revenueRequestJson) {
-
-    log.info("Update revenue with ID: {}", id);
-
+    log.info("Update revenue with ID :: {}", id);
     return revenueService.update(id, converter.convert(revenueRequestJson));
+  }
+
+  @DeleteMapping(value = "/{id}")
+  public ResponseEntity<Object> deleteBy(@PathVariable final String id) {
+    log.info("Delete revenue with ID :: {}", id);
+    return revenueService.delete(id);
   }
 }

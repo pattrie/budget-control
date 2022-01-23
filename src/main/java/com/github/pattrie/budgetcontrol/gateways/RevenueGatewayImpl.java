@@ -37,4 +37,9 @@ public class RevenueGatewayImpl implements RevenueGateway {
   public Optional<Revenue> findBy(String id) {
     return repository.findById(id);
   }
+
+  @Override
+  public void delete(final Revenue revenue) {
+    repository.delete(revenue);
+  }
 }

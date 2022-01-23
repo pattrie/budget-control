@@ -67,10 +67,23 @@ public class RevenueService {
     final Optional<Revenue> revenueFound = revenueGateway.findBy(id);
     if (revenueFound.isPresent()) {
       final Revenue revenueToUpdate = revenueFound.get();
+      log.info("Current revenue information :: {}", revenueToUpdate);
       revenueToUpdate.setDescription(revenue.getDescription());
       revenueToUpdate.setValue(revenue.getValue());
       final Revenue revenueUpdate = revenueGateway.save(revenueToUpdate);
       return ResponseEntity.ok().body(mapper.map(revenueUpdate, RevenueResponseJson.class));
+    }
+
+    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + " with ID :: {}", id);
+    return ResponseEntity.noContent().build();
+  }
+
+  public ResponseEntity<Object> delete(final String id) {
+    final Optional<Revenue> revenue = revenueGateway.findBy(id);
+
+    if (revenue.isPresent()) {
+      revenueGateway.delete(revenue.get());
+      return ResponseEntity.ok().build();
     }
 
     log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + " with ID :: {}", id);

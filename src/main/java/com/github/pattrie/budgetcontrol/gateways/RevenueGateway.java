@@ -13,4 +13,6 @@ public interface RevenueGateway {
   List<Revenue> findAll();
 
   Optional<Revenue> findBy(final String id);
+
+  void delete(final Revenue revenueToDelete);
 }
