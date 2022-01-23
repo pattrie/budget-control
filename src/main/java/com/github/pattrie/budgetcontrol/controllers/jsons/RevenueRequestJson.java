@@ -4,10 +4,12 @@ import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 public class RevenueRequestJson {
 
   @NotBlank
@@ -15,5 +17,4 @@ public class RevenueRequestJson {
 
   @NotBlank
   private String value;
-
 }

@@ -2,6 +2,7 @@ package com.github.pattrie.budgetcontrol.gateways;
 
 import com.github.pattrie.budgetcontrol.domains.Revenue;
 import com.github.pattrie.budgetcontrol.gateways.repositories.RevenueRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,12 @@ public class RevenueGatewayImpl implements RevenueGateway {
 
   @Override
   public Revenue save(final Revenue revenue) {
-    log.info("Saving revenue information: {}", revenue.getValue());
+    log.info("Saving revenue: {}", revenue);
     return repository.save(revenue);
+  }
+
+  @Override
+  public Optional<Revenue> findByDescriptionAndValue(final Revenue revenue) {
+    return repository.findByDescriptionAndValue(revenue.getDescription(), revenue.getValue());
   }
 }

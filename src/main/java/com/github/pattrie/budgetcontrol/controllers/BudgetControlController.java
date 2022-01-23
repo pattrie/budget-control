@@ -28,7 +28,7 @@ public class BudgetControlController {
   public RevenueResponseJson create(
       @RequestBody @Valid final RevenueRequestJson revenueRequestJson) {
 
-    log.info("Creation of Revenue: {}", revenueRequestJson.getValue());
+    log.info("Creation of Revenue: {}", revenueRequestJson.getDescription());
 
     return revenueService.create(converter.convert(revenueRequestJson));
   }
