@@ -3,18 +3,25 @@ package com.github.pattrie.budgetcontrol.usecases;
 import com.github.pattrie.budgetcontrol.controllers.jsons.RevenueResponseJson;
 import com.github.pattrie.budgetcontrol.domains.Revenue;
 import com.github.pattrie.budgetcontrol.gateways.RevenueGateway;
+import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RevenueService {
+
+  //TODO P: Improve URI location.
+  private static final String LOCATION = "http://localhost:8080/v1/budgets/";
 
   private static final Marker REVENUE_ALREADY_EXISTS = MarkerFactory.getMarker(
       "Revenue already exists");
@@ -23,7 +30,7 @@ public class RevenueService {
 
   private final ModelMapper mapper = new ModelMapper();
 
-  public RevenueResponseJson create(final Revenue revenue) {
+  public ResponseEntity<RevenueResponseJson> create(final Revenue revenue) {
 
     final Optional<Revenue> optionalRevenue = revenueGateway.findByDescriptionAndValue(revenue);
 
@@ -33,9 +40,17 @@ public class RevenueService {
       log.info(REVENUE_ALREADY_EXISTS, REVENUE_ALREADY_EXISTS + " - ID: {} :: {}",
           revenueFound.getId(), revenueFound.getDescription());
 
-      return mapper.map(revenueFound, RevenueResponseJson.class);
+      return ResponseEntity.ok().body(mapper.map(revenueFound, RevenueResponseJson.class));
     }
 
-    return mapper.map(revenueGateway.save(revenue), RevenueResponseJson.class);
+    final RevenueResponseJson revenueSaved = mapper.map(revenueGateway.save(revenue),
+        RevenueResponseJson.class);
+
+    return ResponseEntity.created(URI.create(LOCATION + revenueSaved.getId())).body(revenueSaved);
+  }
+
+  public List<RevenueResponseJson> listAll() {
+    return revenueGateway.findAll().stream().map(revenue ->
+        mapper.map(revenue, RevenueResponseJson.class)).collect(Collectors.toList());
   }
 }

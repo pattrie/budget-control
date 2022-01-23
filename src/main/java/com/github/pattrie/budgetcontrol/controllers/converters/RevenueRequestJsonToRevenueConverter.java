@@ -7,7 +7,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RevenueJsonToRevenueConverter implements Converter<RevenueRequestJson, Revenue> {
+public class RevenueRequestJsonToRevenueConverter implements Converter<RevenueRequestJson, Revenue> {
 
   @Override
   public Revenue convert(final RevenueRequestJson revenueRequestJson) {
