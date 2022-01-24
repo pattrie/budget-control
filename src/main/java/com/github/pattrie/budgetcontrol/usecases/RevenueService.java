@@ -1,92 +1,81 @@
 package com.github.pattrie.budgetcontrol.usecases;
 
-import com.github.pattrie.budgetcontrol.controllers.jsons.RevenueResponseJson;
-import com.github.pattrie.budgetcontrol.domains.Revenue;
-import com.github.pattrie.budgetcontrol.gateways.RevenueGateway;
+import com.github.pattrie.budgetcontrol.controllers.jsons.BudgetResponseJson;
+import com.github.pattrie.budgetcontrol.domains.Budget;
+import com.github.pattrie.budgetcontrol.gateways.RevenueGatewayImpl;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class RevenueService {
+@AllArgsConstructor
+public class RevenueService implements BudgetControl {
 
-  //TODO P: Improve URI location.
-  private static final String LOCATION = "http://localhost:8080/v1/budgets/";
-
-  private static final Marker REVENUE_ALREADY_EXISTS = MarkerFactory.getMarker(
-      "Revenue already exists");
-
-  private static final Marker REVENUE_NOT_FOUND = MarkerFactory.getMarker(
-      "Revenue not found");
-
-  private final RevenueGateway revenueGateway;
+  private final RevenueGatewayImpl budgetGateway;
 
   private final ModelMapper mapper = new ModelMapper();
 
-  public ResponseEntity<RevenueResponseJson> create(final Revenue revenue) {
+  public ResponseEntity<BudgetResponseJson> create(final Budget budget) {
 
-    final Optional<Revenue> optionalRevenue = revenueGateway.findByDescriptionAndValue(revenue);
+    final Optional<Budget> optionalRevenue = budgetGateway.findByDescriptionAndValue(budget);
 
     if (optionalRevenue.isPresent()) {
-      final Revenue revenueFound = optionalRevenue.get();
-      log.info(REVENUE_ALREADY_EXISTS, REVENUE_ALREADY_EXISTS + " - ID: {} :: {}",
-          revenueFound.getId(), revenueFound.getDescription());
-      return ResponseEntity.ok().body(mapper.map(revenueFound, RevenueResponseJson.class));
+      final Budget budgetFound = optionalRevenue.get();
+      log.info(BUDGET_ALREADY_EXISTS, BUDGET_ALREADY_EXISTS + " - Revenue with ID: {} :: {}",
+          budgetFound.getId(), budgetFound.getDescription());
+      return ResponseEntity.ok().body(mapper.map(budgetFound, BudgetResponseJson.class));
     }
 
-    final RevenueResponseJson revenueSaved = mapper.map(revenueGateway.save(revenue),
-        RevenueResponseJson.class);
+    final BudgetResponseJson revenueSaved = mapper.map(budgetGateway.save(budget),
+        BudgetResponseJson.class);
     return ResponseEntity.created(URI.create(LOCATION + revenueSaved.getId())).body(revenueSaved);
   }
 
-  public List<RevenueResponseJson> getAll() {
-    return revenueGateway.findAll().stream().map(revenue ->
-        mapper.map(revenue, RevenueResponseJson.class)).collect(Collectors.toList());
+  public List<BudgetResponseJson> getAll() {
+    return budgetGateway.findAll().stream().map(revenue ->
+        mapper.map(revenue, BudgetResponseJson.class)).collect(Collectors.toList());
   }
 
-  public ResponseEntity<RevenueResponseJson> getBy(final String id) {
-    final Optional<Revenue> revenue = revenueGateway.findBy(id);
+  public ResponseEntity<BudgetResponseJson> getBy(final String id) {
+    final Optional<Budget> revenue = budgetGateway.findBy(id);
     if (revenue.isPresent()) {
-      return ResponseEntity.ok().body(mapper.map(revenue.get(), RevenueResponseJson.class));
+      return ResponseEntity.ok().body(mapper.map(revenue.get(), BudgetResponseJson.class));
     }
-    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + " with ID :: {}", id);
+    log.info(BUDGET_NOT_FOUND, BUDGET_NOT_FOUND + " - Revenue with ID :: {}", id);
     return ResponseEntity.noContent().build();
   }
 
-  public ResponseEntity<RevenueResponseJson> update(final String id, final Revenue revenue) {
-    final Optional<Revenue> revenueFound = revenueGateway.findBy(id);
+  public ResponseEntity<BudgetResponseJson> update(final String id, final Budget budget) {
+    final Optional<Budget> revenueFound = budgetGateway.findBy(id);
     if (revenueFound.isPresent()) {
-      final Revenue revenueToUpdate = revenueFound.get();
-      log.info("Current revenue information :: {}", revenueToUpdate);
-      revenueToUpdate.setDescription(revenue.getDescription());
-      revenueToUpdate.setValue(revenue.getValue());
-      final Revenue revenueUpdate = revenueGateway.save(revenueToUpdate);
-      return ResponseEntity.ok().body(mapper.map(revenueUpdate, RevenueResponseJson.class));
+      final Budget budgetToUpdate = revenueFound.get();
+      log.info("Current revenue information :: {}", budgetToUpdate);
+      budgetToUpdate.setDescription(budget.getDescription());
+      budgetToUpdate.setValue(budget.getValue());
+      final Budget budgetUpdate = budgetGateway.save(budgetToUpdate);
+      return ResponseEntity.ok().body(mapper.map(budgetUpdate, BudgetResponseJson.class));
     }
 
-    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + " with ID :: {}", id);
+    log.info(BUDGET_NOT_FOUND, BUDGET_NOT_FOUND + " - Revenue with ID :: {}", id);
     return ResponseEntity.noContent().build();
   }
 
   public ResponseEntity<Object> delete(final String id) {
-    final Optional<Revenue> revenue = revenueGateway.findBy(id);
+    final Optional<Budget> revenue = budgetGateway.findBy(id);
 
     if (revenue.isPresent()) {
-      revenueGateway.delete(revenue.get());
+      budgetGateway.delete(revenue.get());
       return ResponseEntity.ok().build();
     }
 
-    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + " with ID :: {}", id);
+    log.info(BUDGET_NOT_FOUND, BUDGET_NOT_FOUND + " - Revenue with ID :: {}", id);
     return ResponseEntity.noContent().build();
   }
 }

@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class RevenueRequestJson {
+public class BudgetRequestJson {
 
   @NotBlank
   private String description;
