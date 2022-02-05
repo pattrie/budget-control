@@ -7,7 +7,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Marker;
@@ -17,17 +17,15 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RevenueService {
 
   //TODO P: Improve URI location.
-  private static final String LOCATION = "http://localhost:8080/v1/budgets/";
+  public static final String LOCATION = "http://localhost:8080/v1/budgets/";
+  public static final String WITH_ID = " - with ID :: {}";
 
-  private static final Marker REVENUE_ALREADY_EXISTS = MarkerFactory.getMarker(
-      "Revenue already exists");
-
-  private static final Marker REVENUE_NOT_FOUND = MarkerFactory.getMarker(
-      "Revenue not found");
+  Marker REVENUE_ALREADY_EXISTS = MarkerFactory.getMarker("Revenue already exists");
+  Marker REVENUE_NOT_FOUND = MarkerFactory.getMarker("Revenue not found");
 
   private final RevenueGateway revenueGateway;
 
@@ -39,7 +37,7 @@ public class RevenueService {
 
     if (optionalRevenue.isPresent()) {
       final Revenue revenueFound = optionalRevenue.get();
-      log.info(REVENUE_ALREADY_EXISTS, REVENUE_ALREADY_EXISTS + " - ID: {} :: {}",
+      log.info(REVENUE_ALREADY_EXISTS, REVENUE_ALREADY_EXISTS + WITH_ID + " :: {}",
           revenueFound.getId(), revenueFound.getDescription());
       return ResponseEntity.ok().body(mapper.map(revenueFound, RevenueResponseJson.class));
     }
@@ -59,7 +57,7 @@ public class RevenueService {
     if (revenue.isPresent()) {
       return ResponseEntity.ok().body(mapper.map(revenue.get(), RevenueResponseJson.class));
     }
-    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + " with ID :: {}", id);
+    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + WITH_ID, id);
     return ResponseEntity.noContent().build();
   }
 
@@ -74,7 +72,7 @@ public class RevenueService {
       return ResponseEntity.ok().body(mapper.map(revenueUpdate, RevenueResponseJson.class));
     }
 
-    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + " with ID :: {}", id);
+    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + WITH_ID, id);
     return ResponseEntity.noContent().build();
   }
 
@@ -86,7 +84,7 @@ public class RevenueService {
       return ResponseEntity.ok().build();
     }
 
-    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + " with ID :: {}", id);
+    log.info(REVENUE_NOT_FOUND, REVENUE_NOT_FOUND + WITH_ID, id);
     return ResponseEntity.noContent().build();
   }
 }

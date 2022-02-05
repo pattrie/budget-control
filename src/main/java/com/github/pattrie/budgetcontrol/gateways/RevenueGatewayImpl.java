@@ -4,27 +4,31 @@ import com.github.pattrie.budgetcontrol.domains.Revenue;
 import com.github.pattrie.budgetcontrol.gateways.repositories.RevenueRepository;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RevenueGatewayImpl implements RevenueGateway {
 
   private final RevenueRepository repository;
 
+  private final ModelMapper mapper = new ModelMapper();
+
   @Override
-  public Revenue save(final Revenue revenue) {
+  public Revenue save(final Revenue revenue){
     log.info("Saving revenue: {}", revenue);
-    return repository.save(revenue);
+    return repository.save(mapper.map(revenue, Revenue.class));
   }
 
   @Override
-  public Optional<Revenue> findByDescriptionAndValue(final Revenue revenue) {
+  public  Optional<Revenue> findByDescriptionAndValue(final Revenue revenue) {
     log.info("Find revenue by description: {} and value: {}", revenue.getDescription(),
         revenue.getValue());
+
     return repository.findByDescriptionAndValue(revenue.getDescription(), revenue.getValue());
   }
 
@@ -35,7 +39,7 @@ public class RevenueGatewayImpl implements RevenueGateway {
 
   @Override
   public Optional<Revenue> findBy(String id) {
-    return repository.findById(id);
+   return repository.findById(id);
   }
 
   @Override

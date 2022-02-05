@@ -1,22 +1,25 @@
 package com.github.pattrie.budgetcontrol.controllers.jsons;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 
 @Getter
-@ToString
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RevenueRequestJson {
+public class ExpenseResponseJson {
 
-  @NotBlank
+  private String id;
+
   private String description;
 
-  @NotBlank
-  @Positive
   private String value;
+
+  private String date;
+
+  private String category;
 }
