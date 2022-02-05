@@ -1,11 +1,9 @@
 package com.github.pattrie.budgetcontrol.gateways;
 
-import com.github.pattrie.budgetcontrol.domains.Budget;
 import com.github.pattrie.budgetcontrol.domains.Expense;
 import com.github.pattrie.budgetcontrol.gateways.repositories.ExpenseRepository;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -14,43 +12,39 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @AllArgsConstructor
-public class ExpenseGatewayImpl implements BudgetGateway {
+public class ExpenseGatewayImpl implements ExpenseGateway {
 
   private final ExpenseRepository repository;
 
   private final ModelMapper mapper = new ModelMapper();
 
   @Override
-  public Budget save(final Budget budget) {
-    log.info("Saving revenue: {}", budget);
-    return repository.save(mapper.map(budget, Expense.class));
+  public Expense save(final Expense expense) {
+    log.info("Saving expense: {}", expense);
+    return repository.save(expense);
   }
 
   @Override
-  public Optional<Budget> findByDescriptionAndValue(final Budget budget) {
-    log.info(
-        "Find revenue by description: {} and value: {}",
-        budget.getDescription(),
-        budget.getValue());
+  public Optional<Expense> findByDescriptionAndValue(final Expense expense) {
+    log.info("Find expense by description: {} and value: {}",
+        expense.getDescription(),
+        expense.getValue());
 
-    return repository.findByDescriptionAndValue(budget.getDescription(), budget.getValue());
+    return repository.findByDescriptionAndValue(expense.getDescription(), expense.getValue());
   }
 
   @Override
-  public List<Budget> findAll() {
-    return repository.findAll().stream()
-        .map(expense -> mapper.map(expense, Budget.class))
-        .collect(Collectors.toList());
+  public List<Expense> findAll() {
+    return repository.findAll();
   }
 
   @Override
-  public Optional<Budget> findBy(String id) {
-    final Optional<Expense> expense = repository.findById(id);
-    return Optional.of(mapper.map(expense.get(), Budget.class));
+  public Optional<Expense> findBy(String id) {
+    return repository.findById(id);
   }
 
   @Override
-  public void delete(final Budget budget) {
-    repository.delete(mapper.map(budget, Expense.class));
+  public void delete(final Expense expense) {
+    repository.delete(expense);
   }
 }

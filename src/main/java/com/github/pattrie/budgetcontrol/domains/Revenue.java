@@ -1,6 +1,5 @@
 package com.github.pattrie.budgetcontrol.domains;
 
-import com.github.pattrie.budgetcontrol.domains.enums.Category;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document
-public class Expense {
+public class Revenue {
 
   private String id;
 
@@ -27,5 +26,4 @@ public class Expense {
 
   private LocalDateTime date;
 
-  private Category category;
 }

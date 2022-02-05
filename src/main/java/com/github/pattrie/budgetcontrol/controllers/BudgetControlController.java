@@ -2,12 +2,14 @@ package com.github.pattrie.budgetcontrol.controllers;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import com.github.pattrie.budgetcontrol.controllers.converters.BudgetRequestJsonToBudgetConverter;
-import com.github.pattrie.budgetcontrol.controllers.jsons.BudgetRequestJson;
-import com.github.pattrie.budgetcontrol.controllers.jsons.BudgetResponseJson;
-import com.github.pattrie.budgetcontrol.domains.Budget;
-import com.github.pattrie.budgetcontrol.usecases.BudgetControl;
-import com.github.pattrie.budgetcontrol.usecases.BudgetControlService;
+import com.github.pattrie.budgetcontrol.controllers.converters.ExpenseRequestJsonToExpenseConverter;
+import com.github.pattrie.budgetcontrol.controllers.converters.RevenueRequestJsonToRevenueConverter;
+import com.github.pattrie.budgetcontrol.controllers.jsons.ExpenseRequestJson;
+import com.github.pattrie.budgetcontrol.controllers.jsons.ExpenseResponseJson;
+import com.github.pattrie.budgetcontrol.controllers.jsons.RevenueRequestJson;
+import com.github.pattrie.budgetcontrol.controllers.jsons.RevenueResponseJson;
+import com.github.pattrie.budgetcontrol.domains.Expense;
+import com.github.pattrie.budgetcontrol.domains.Revenue;
 import com.github.pattrie.budgetcontrol.usecases.ExpenseService;
 import com.github.pattrie.budgetcontrol.usecases.RevenueService;
 import java.util.List;
@@ -32,61 +34,70 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class BudgetControlController {
 
-  private final BudgetRequestJsonToBudgetConverter converter;
+  private final RevenueRequestJsonToRevenueConverter toRevenue;
+
+  private final ExpenseRequestJsonToExpenseConverter toExpense;
 
   private final RevenueService revenueService;
 
   private final ExpenseService expenseService;
 
-  private final BudgetControlService budgetControlService;
+  @PostMapping(value = "/revenues", consumes = APPLICATION_JSON_VALUE)
+  public ResponseEntity<RevenueResponseJson> createRevenue(
+      @RequestBody @Valid final RevenueRequestJson revenueRequestJson) {
+    log.info("Creation of Budget :: {}", revenueRequestJson.getDescription());
+    final Revenue revenue = toRevenue.convert(revenueRequestJson);
+    return revenueService.create(revenue);
+  }
 
-  @PostMapping(consumes = APPLICATION_JSON_VALUE)
-  public ResponseEntity<BudgetResponseJson> create(
-      @RequestBody @Valid final BudgetRequestJson budgetRequestJson) {
-    log.info("Creation of Budget :: {}", budgetRequestJson.getDescription());
-
-    final Budget budget = converter.convert(budgetRequestJson);
-    final BudgetControl budgetCreate = budgetControlService.execute(budget);
-
-    return budgetCreate.create(budget);
+  @PostMapping(value = "/expenses", consumes = APPLICATION_JSON_VALUE)
+  public ResponseEntity<ExpenseResponseJson> createExpense(
+      @RequestBody @Valid final ExpenseRequestJson expenseRequestJson) {
+    log.info("Creation of Budget :: {}", expenseRequestJson.getDescription());
+    final Expense expense = toExpense.convert(expenseRequestJson);
+    return expenseService.create(expense);
   }
 
   @GetMapping(value = "/revenues", produces = APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public List<BudgetResponseJson> getAllRevenues() {
+  public List<RevenueResponseJson> getAllRevenues() {
     log.info("List all revenues.");
     return revenueService.getAll();
   }
 
   @GetMapping(value = "/expenses", produces = APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public List<BudgetResponseJson> getAllExpenses() {
+  public List<ExpenseResponseJson> getAllExpenses() {
     log.info("List all expenses.");
     return expenseService.getAll();
   }
 
   @GetMapping(value = "/revenues/{id}", produces = APPLICATION_JSON_VALUE)
-  public ResponseEntity<BudgetResponseJson> getRevenueBy(@PathVariable final String id) {
+  public ResponseEntity<RevenueResponseJson> getRevenueBy(@PathVariable final String id) {
     log.info("Find revenue with ID :: {}", id);
     return revenueService.getBy(id);
   }
 
   @GetMapping(value = "/expenses/{id}", produces = APPLICATION_JSON_VALUE)
-  public ResponseEntity<BudgetResponseJson> getExpenseBy(@PathVariable final String id) {
+  public ResponseEntity<ExpenseResponseJson> getExpenseBy(@PathVariable final String id) {
     log.info("Find expense with ID :: {}", id);
     return expenseService.getBy(id);
   }
 
-  @PutMapping(value = "/{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-  public ResponseEntity<BudgetResponseJson> updateBy(@PathVariable final String id,
-      @RequestBody @Valid final BudgetRequestJson budgetRequestJson) {
+  @PutMapping(value = "/revenues/{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+  public ResponseEntity<RevenueResponseJson> updateRevenueBy(@PathVariable final String id,
+      @RequestBody @Valid final RevenueRequestJson revenueRequestJson) {
     log.info("Update budget with ID :: {}", id);
+    final Revenue revenue = toRevenue.convert(revenueRequestJson);
+    return revenueService.update(id, revenue);
+  }
 
-    final Budget budget = converter.convert(budgetRequestJson);
-
-    final BudgetControl budgetCreate = budgetControlService.execute(budget);
-
-    return budgetCreate.update(id, budget);
+  @PutMapping(value = "/expenses/{id}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+  public ResponseEntity<ExpenseResponseJson> updateExpenseBy(@PathVariable final String id,
+      @RequestBody @Valid final ExpenseRequestJson expenseRequestJson) {
+    log.info("Update budget with ID :: {}", id);
+    final Expense expense = toExpense.convert(expenseRequestJson);
+    return expenseService.update(id, expense);
   }
 
   @DeleteMapping(value = "/revenues/{id}")

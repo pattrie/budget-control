@@ -1,7 +1,7 @@
 package com.github.pattrie.budgetcontrol.usecases;
 
-import com.github.pattrie.budgetcontrol.controllers.jsons.BudgetResponseJson;
-import com.github.pattrie.budgetcontrol.domains.Budget;
+import com.github.pattrie.budgetcontrol.controllers.jsons.ExpenseResponseJson;
+import com.github.pattrie.budgetcontrol.domains.Expense;
 import com.github.pattrie.budgetcontrol.gateways.ExpenseGatewayImpl;
 import java.net.URI;
 import java.util.List;
@@ -10,72 +10,82 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExpenseService implements BudgetControl {
+public class ExpenseService {
 
-  private final ExpenseGatewayImpl budgetGateway;
+  //TODO P: Improve URI location.
+  public static final String LOCATION = "http://localhost:8080/v1/budgets/";
+  public static final String WITH_ID = " - with ID :: {}";
+
+  Marker EXPENSE_ALREADY_EXISTS = MarkerFactory.getMarker("Expense already exists");
+  Marker EXPENSE_NOT_FOUND = MarkerFactory.getMarker("Expense not found");
+
+  private final ExpenseGatewayImpl expenseGateway;
 
   private final ModelMapper mapper = new ModelMapper();
 
-  public ResponseEntity<BudgetResponseJson> create(final Budget budget) {
+  public ResponseEntity<ExpenseResponseJson> create(final Expense expense) {
 
-    final Optional<Budget> optionalRevenue = budgetGateway.findByDescriptionAndValue(budget);
+    final Optional<Expense> optionalExpense = expenseGateway.findByDescriptionAndValue(expense);
 
-    if (optionalRevenue.isPresent()) {
-      final Budget budgetFound = optionalRevenue.get();
-      log.info(BUDGET_ALREADY_EXISTS, BUDGET_ALREADY_EXISTS + " - Expense with ID: {} :: {}",
-          budgetFound.getId(), budgetFound.getDescription());
-      return ResponseEntity.ok().body(mapper.map(budgetFound, BudgetResponseJson.class));
+    if (optionalExpense.isPresent()) {
+      final Expense expenseFound = optionalExpense.get();
+      log.info(EXPENSE_ALREADY_EXISTS, EXPENSE_ALREADY_EXISTS + WITH_ID + " :: {}",
+          expenseFound.getId(), expenseFound.getDescription());
+      return ResponseEntity.ok().body(mapper.map(expenseFound, ExpenseResponseJson.class));
     }
 
-    final BudgetResponseJson revenueSaved = mapper.map(budgetGateway.save(budget),
-        BudgetResponseJson.class);
+    final ExpenseResponseJson revenueSaved = mapper.map(expenseGateway.save(expense),
+        ExpenseResponseJson.class);
     return ResponseEntity.created(URI.create(LOCATION + revenueSaved.getId())).body(revenueSaved);
   }
 
-  public List<BudgetResponseJson> getAll() {
-    return budgetGateway.findAll().stream().map(revenue ->
-        mapper.map(revenue, BudgetResponseJson.class)).collect(Collectors.toList());
+  public List<ExpenseResponseJson> getAll() {
+    return expenseGateway.findAll().stream().map(expense ->
+        mapper.map(expense, ExpenseResponseJson.class)).collect(Collectors.toList());
   }
 
-  public ResponseEntity<BudgetResponseJson> getBy(final String id) {
-    final Optional<Budget> revenue = budgetGateway.findBy(id);
+  public ResponseEntity<ExpenseResponseJson> getBy(final String id) {
+    final Optional<Expense> revenue = expenseGateway.findBy(id);
     if (revenue.isPresent()) {
-      return ResponseEntity.ok().body(mapper.map(revenue.get(), BudgetResponseJson.class));
+      return ResponseEntity.ok().body(mapper.map(revenue.get(), ExpenseResponseJson.class));
     }
-    log.info(BUDGET_NOT_FOUND, BUDGET_NOT_FOUND + " - Expense with ID :: {}", id);
+    log.info(EXPENSE_NOT_FOUND, EXPENSE_NOT_FOUND + WITH_ID, id);
     return ResponseEntity.noContent().build();
   }
 
-  public ResponseEntity<BudgetResponseJson> update(final String id, final Budget budget) {
-    final Optional<Budget> revenueFound = budgetGateway.findBy(id);
-    if (revenueFound.isPresent()) {
-      final Budget budgetToUpdate = revenueFound.get();
-      log.info("Current expense information :: {}", budgetToUpdate);
-      budgetToUpdate.setDescription(budget.getDescription());
-      budgetToUpdate.setValue(budget.getValue());
-      final Budget budgetUpdate = budgetGateway.save(budgetToUpdate);
-      return ResponseEntity.ok().body(mapper.map(budgetUpdate, BudgetResponseJson.class));
+  public ResponseEntity<ExpenseResponseJson> update(final String id, final Expense expense) {
+    final Optional<Expense> expenseFound = expenseGateway.findBy(id);
+    if (expenseFound.isPresent()) {
+      final Expense expenseToUpdate = expenseFound.get();
+      log.info("Current expense information :: {}", expenseToUpdate);
+      expenseToUpdate.setDescription(expense.getDescription());
+      expenseToUpdate.setValue(expense.getValue());
+      expenseToUpdate.setCategory(expense.getCategory());
+      final Expense expenseUpdate = expenseGateway.save(expenseToUpdate);
+      return ResponseEntity.ok().body(mapper.map(expenseUpdate, ExpenseResponseJson.class));
     }
 
-    log.info(BUDGET_NOT_FOUND, BUDGET_NOT_FOUND + " - Expense with ID :: {}", id);
+    log.info(EXPENSE_NOT_FOUND, EXPENSE_NOT_FOUND + WITH_ID, id);
     return ResponseEntity.noContent().build();
   }
 
   public ResponseEntity<Object> delete(final String id) {
-    final Optional<Budget> revenue = budgetGateway.findBy(id);
+    final Optional<Expense> expense = expenseGateway.findBy(id);
 
-    if (revenue.isPresent()) {
-      budgetGateway.delete(revenue.get());
+    if (expense.isPresent()) {
+      expenseGateway.delete(expense.get());
       return ResponseEntity.ok().build();
     }
 
-    log.info(BUDGET_NOT_FOUND, BUDGET_NOT_FOUND + " - Expense with ID :: {}", id);
+    log.info(EXPENSE_NOT_FOUND, EXPENSE_NOT_FOUND + WITH_ID, id);
     return ResponseEntity.noContent().build();
   }
 }
