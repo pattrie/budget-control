@@ -2,8 +2,10 @@ package com.github.pattrie.budgetcontrol.usecases;
 
 import com.github.pattrie.budgetcontrol.controllers.jsons.ExpenseResponseJson;
 import com.github.pattrie.budgetcontrol.domains.Expense;
-import com.github.pattrie.budgetcontrol.gateways.ExpenseGatewayImpl;
+import com.github.pattrie.budgetcontrol.gateways.ExpenseGateway;
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +29,7 @@ public class ExpenseService {
   Marker EXPENSE_ALREADY_EXISTS = MarkerFactory.getMarker("Expense already exists");
   Marker EXPENSE_NOT_FOUND = MarkerFactory.getMarker("Expense not found");
 
-  private final ExpenseGatewayImpl expenseGateway;
+  private final ExpenseGateway expenseGateway;
 
   private final ModelMapper mapper = new ModelMapper();
 
@@ -49,6 +51,11 @@ public class ExpenseService {
 
   public List<ExpenseResponseJson> getAll() {
     return expenseGateway.findAll().stream().map(expense ->
+        mapper.map(expense, ExpenseResponseJson.class)).collect(Collectors.toList());
+  }
+
+  public List<ExpenseResponseJson> getExpenseByDescription(String description) {
+    return expenseGateway.findByDescription(description).stream().map(expense ->
         mapper.map(expense, ExpenseResponseJson.class)).collect(Collectors.toList());
   }
 
@@ -87,5 +94,25 @@ public class ExpenseService {
 
     log.info(EXPENSE_NOT_FOUND, EXPENSE_NOT_FOUND + WITH_ID, id);
     return ResponseEntity.noContent().build();
+  }
+
+  public ResponseEntity<List<ExpenseResponseJson>> getExpenseByYearAndMonth(int month, int year) {
+    final LocalDate initialDate = LocalDate.of(year, month, 1);
+    final LocalDate finalDate = initialDate.withDayOfMonth(initialDate.lengthOfMonth());
+
+    LocalDateTime yearMonthInitialDate = LocalDateTime.of(initialDate, LocalDateTime.MIN.toLocalTime());
+    LocalDateTime yearMonthFinalDate = LocalDateTime.of(finalDate, LocalDateTime.MIN.toLocalTime());
+
+    final List<ExpenseResponseJson> expenseResponseJsons =
+        expenseGateway.findByYearAndMonth(yearMonthInitialDate, yearMonthFinalDate).stream()
+            .map(expense -> mapper.map(expense, ExpenseResponseJson.class))
+            .collect(Collectors.toList());
+
+    if (expenseResponseJsons.isEmpty()) {
+      log.info(EXPENSE_NOT_FOUND, "List of " + EXPENSE_NOT_FOUND + " - Period :: {} / {}", month, year);
+      return ResponseEntity.noContent().build();
+    }
+
+    return ResponseEntity.ok(expenseResponseJsons);
   }
 }

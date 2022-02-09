@@ -2,6 +2,7 @@ package com.github.pattrie.budgetcontrol.gateways;
 
 import com.github.pattrie.budgetcontrol.domains.Revenue;
 import com.github.pattrie.budgetcontrol.gateways.repositories.RevenueRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -45,5 +46,16 @@ public class RevenueGatewayImpl implements RevenueGateway {
   @Override
   public void delete(final Revenue revenue) {
     repository.delete(revenue);
+  }
+
+  @Override
+  public Optional<Revenue> findByDescription(String description) {
+    return repository.findByDescription(description);
+  }
+
+  @Override
+  public List<Revenue> findByYearAndMonth(LocalDateTime initialDate,
+      LocalDateTime finalDate) {
+    return repository.findByDate(initialDate, finalDate);
   }
 }
