@@ -2,6 +2,7 @@ package com.github.pattrie.budgetcontrol.gateways;
 
 import com.github.pattrie.budgetcontrol.domains.Expense;
 import com.github.pattrie.budgetcontrol.gateways.repositories.ExpenseRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,16 @@ public class ExpenseGatewayImpl implements ExpenseGateway {
         expense.getValue());
 
     return repository.findByDescriptionAndValue(expense.getDescription(), expense.getValue());
+  }
+
+  @Override
+  public List<Expense> findByDescription(final String description) {
+    return repository.findByDescription(description);
+  }
+
+  @Override
+  public List<Expense> findByYearAndMonth(final LocalDateTime initialDate, final LocalDateTime finalDate) {
+    return repository.findByDate(initialDate, finalDate);
   }
 
   @Override
