@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Component;
 public class ExpenseGatewayImpl implements ExpenseGateway {
 
   private final ExpenseRepository repository;
-
-  private final ModelMapper mapper = new ModelMapper();
 
   @Override
   public Expense save(final Expense expense) {
@@ -40,7 +37,8 @@ public class ExpenseGatewayImpl implements ExpenseGateway {
   }
 
   @Override
-  public List<Expense> findByYearAndMonth(final LocalDateTime initialDate, final LocalDateTime finalDate) {
+  public List<Expense> findByYearAndMonth(final LocalDateTime initialDate,
+      final LocalDateTime finalDate) {
     return repository.findByDate(initialDate, finalDate);
   }
 
