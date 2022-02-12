@@ -1,5 +1,7 @@
 package com.github.pattrie.budgetcontrol.controllers.jsons;
 
+import com.github.pattrie.budgetcontrol.domains.ExpenseCategory;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,5 +20,7 @@ public class BudgetResponseJson {
   private Long totalExpense;
 
   private Long finalBalance;
+
+  private List<ExpenseCategory> expenseCategory;
 
 }

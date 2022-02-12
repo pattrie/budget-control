@@ -54,8 +54,7 @@ public class RevenueGatewayImpl implements RevenueGateway {
   }
 
   @Override
-  public List<Revenue> findByYearAndMonth(LocalDateTime initialDate,
-      LocalDateTime finalDate) {
+  public List<Revenue> findByYearAndMonth(LocalDateTime initialDate, LocalDateTime finalDate) {
     return repository.findByDate(initialDate, finalDate);
   }
 }

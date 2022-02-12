@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ExpenseService {
 
-  //TODO P: Improve URI location.
   public static final String LOCATION = "http://localhost:8080/v1/budgets/";
   public static final String WITH_ID = " - with ID :: {}";
 

@@ -2,12 +2,16 @@ package com.github.pattrie.budgetcontrol.usecases;
 
 import com.github.pattrie.budgetcontrol.controllers.jsons.BudgetResponseJson;
 import com.github.pattrie.budgetcontrol.domains.Expense;
+import com.github.pattrie.budgetcontrol.domains.ExpenseCategory;
 import com.github.pattrie.budgetcontrol.domains.Revenue;
+import com.github.pattrie.budgetcontrol.domains.enums.Category;
 import com.github.pattrie.budgetcontrol.gateways.ExpenseGateway;
 import com.github.pattrie.budgetcontrol.gateways.RevenueGateway;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -47,9 +51,33 @@ public class BudgetControlService {
 
     final long finalBalance = revenueSum + expenseSum;
 
-    final BudgetResponseJson budgetResponseJson = BudgetResponseJson.builder().totalRevenue(revenueSum)
-        .totalExpense(expenseSum).finalBalance(finalBalance).build();
+    final List<Category> categories = expenseByYearAndMonth.stream()
+            .map(Expense::getCategory)
+            .distinct()
+            .collect(Collectors.toList());
+
+    final BudgetResponseJson budgetResponseJson = BudgetResponseJson.builder()
+            .totalRevenue(revenueSum)
+            .totalExpense(expenseSum)
+            .finalBalance(finalBalance)
+            .expenseCategory(getExpenseCategories(expenseByYearAndMonth, categories))
+            .build();
 
     return ResponseEntity.ok(budgetResponseJson);
+  }
+
+  private List<ExpenseCategory> getExpenseCategories(final List<Expense> expenseByYearAndMonth,
+      final List<Category> categories) {
+    final List<ExpenseCategory> categoryList = new ArrayList<>();
+    for (Category category: categories) {
+      final ExpenseCategory expenseCategory = new ExpenseCategory();
+      expenseCategory.setCategory(category);
+      final Float totalCategory = expenseByYearAndMonth.stream()
+          .filter(expense -> expense.getCategory().equals(category))
+          .reduce(0.0f, (total, expense) -> total + expense.getValue(), Float::sum);
+      expenseCategory.setTotal(totalCategory);
+      categoryList.add(expenseCategory);
+    }
+    return categoryList;
   }
 }

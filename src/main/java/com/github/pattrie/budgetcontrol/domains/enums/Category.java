@@ -14,15 +14,15 @@ public enum Category {
   UNFORESEEN("unforeseen"),
   OTHERS("others");
 
-  @Getter private final String[] synonymCategorys;
+  @Getter private final String[] synonymCategories;
 
   Category(String... synonymDescriptions) {
-    this.synonymCategorys = synonymDescriptions;
+    this.synonymCategories = synonymDescriptions;
   }
 
   public static Category valueOfBySynonymCategory(String category) {
     return Stream.of(values())
-        .filter(item -> Set.of(item.getSynonymCategorys()).contains(category))
+        .filter(item -> Set.of(item.getSynonymCategories()).contains(category == null ? "" : category))
         .findAny().orElse(Category.OTHERS);
   }
 }
