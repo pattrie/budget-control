@@ -1,3 +1,6 @@
+springfox:
+  pathMapping: /
+
 spring:
   data:
     mongodb:
