@@ -22,7 +22,7 @@ public enum Category {
 
   public static Category valueOfBySynonymCategory(String category) {
     return Stream.of(values())
-        .filter(item -> Set.of(item.getSynonymCategories()).contains(category == null ? "" : category))
+        .filter(item -> Set.of(item.getSynonymCategories()).contains(category == null ? "" : category.toLowerCase()))
         .findAny().orElse(Category.OTHERS);
   }
 }
