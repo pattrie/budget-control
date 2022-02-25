@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/v1/budgets/expenses")
+@ApiResponses(value = {@ApiResponse(code = 204, message = "Expense not found")})
 @RequiredArgsConstructor
 public class ExpenseController {
 

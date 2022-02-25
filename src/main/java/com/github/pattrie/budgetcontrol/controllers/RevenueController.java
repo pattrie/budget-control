@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/v1/budgets/revenues")
+@ApiResponses(value = {@ApiResponse(code = 204, message = "Revenue not found")})
 @RequiredArgsConstructor
 public class RevenueController {
 
