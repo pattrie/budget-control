@@ -1,4 +1,4 @@
-package com.github.pattrie.budgetcontrol.configurations;
+package com.github.pattrie.budgetcontrol.configurations.springfox;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
