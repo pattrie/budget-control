@@ -28,7 +28,7 @@ public class AccessController {
 
   @PostMapping(consumes = APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<UserResponseJson> createExpense(
+  public ResponseEntity<UserResponseJson> createLogin(
       @RequestBody @Valid final UserRequestJson userRequestJson) {
     log.info("Creation of login :: {}", userRequestJson.getEmail());
     final User user =
